@@ -1,4 +1,5 @@
 require_relative 'spec_helper'
+require 'pry'
 
 describe Student do
 
@@ -64,7 +65,7 @@ describe Student do
     it 'creates an instance with corresponding attribute values' do
       row = [1, "Pat", 12]
       pat = Student.new_from_db(row)
-
+      # binding.pry
       expect(pat.id).to eq(row[0])
       expect(pat.name).to eq(row[1])
       expect(pat.grade).to eq(row[2])
@@ -80,6 +81,7 @@ describe Student do
         pat.save
 
         pat_from_db = Student.find_by_name("Pat")
+        # binding.pry
         expect(pat_from_db.name).to eq("Pat")
         expect(pat_from_db).to be_an_instance_of(Student)
       end
@@ -109,6 +111,7 @@ describe Student do
         sam.save
 
         all_but_12th = Student.students_below_12th_grade
+        # binding.pry
         expect(all_but_12th.size).to eq(1)
         expect(all_but_12th.first.name).to eq('Sam')
       end
@@ -124,6 +127,7 @@ describe Student do
         sam.save
 
         all_from_db = Student.all
+        # binding.pry
         expect(all_from_db.size).to eq(2)
         expect(all_from_db.last).to be_an_instance_of(Student)
         expect(all_from_db.any? {|student| student.name == "Sam"}).to eq(true)
@@ -144,6 +148,7 @@ describe Student do
         jess.save
 
         first_X_students = Student.first_X_students_in_grade_10(2)
+        # binding.pry
         expect(first_X_students.size).to eq(2)
       end
     end
