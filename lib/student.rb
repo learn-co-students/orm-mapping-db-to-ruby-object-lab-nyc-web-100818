@@ -107,8 +107,9 @@ class Student
     LIMIT 1
     SQL
 
-    first_student = DB[:conn].execute(sql).flatten # this a row
-    self.new_from_db(first_student) # pass first student row into this method to spit out the instance
+    first_student = DB[:conn].execute(sql).map do |row| # this a row
+    self.new_from_db(row) # pass first student row into this method to spit out the instance
+  end.first
   end
 
   def self.all_students_in_grade_X(x) # multiple rows
