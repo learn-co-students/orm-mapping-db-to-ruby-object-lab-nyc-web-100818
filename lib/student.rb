@@ -16,21 +16,32 @@ class Student
     # retrieve all the rows from the "Students" database
 
  #value of {} = new instance of SQLite3::Database class &how we connect to our db. db instance responds to a method 'execute' that accepts raw SQL as string
-    DB[:conn].execute("SELECT * FROM STUDENTS").map do|row| 
-      new_from_db(row)
-    end
-       #eturn [] of rows from db, matches our query--then iterate over e/ row, use self.new_from_db to CREATE new obj for e/ row!
-    # remember each row should be a new instance of the Student class
+    sql = <<-SQL
+      SELECT * 
+      FROM students;
+    SQL
 
+
+    DB[:conn].execute(sql).map do |row|
+      self.new_from_db(row)
+    end
   end
+  
 
 
   def self.find_by_name(name)
-    # find the student in the database given a name
+    # find the student in the database given a namee
+    sql = <<-SQL
+      SELECT *
+      FROM students
+      WHERE name = ?
+      LIMIT 1;
+    SQL
 
-  student = DB[:conn].execute("SELECT * FROM students WHERE name = ?", name).flatten
-  new_from_db(student)
     # return a new instance of the Student class
+    DB[:conn].execute(sql, name).map do |row|
+      self.new_from_db(row)
+    end.first
   end
   
 
@@ -56,44 +67,65 @@ class Student
     DB[:conn].execute(sql)
   end
 
-
   def self.drop_table
     sql = "DROP TABLE IF EXISTS students"
     DB[:conn].execute(sql)
   end
 
-
   def self.all_students_in_grade_9
+    sql = <<-SQL
+      SELECT *
+      FROM students
+      WHERE grade = 9
+    SQL
 
-    students_arr = DB[:conn].execute("SELECT *
-    FROM students WHERE grade = 9;")
-
+     DB[:conn].execute(sql).map do |row|
+      self.new_from_db(row)
+     end
   end
 
 
   def self.students_below_12th_grade
+    sql = <<-SQL
+      SELECT *
+      FROM students
+      WHERE grade < 12
+    SQL
 
-    students_arr = DB[:conn].execute("SELECT * FROM students WHERE grade < 12;")
-    students_arr.map {|student| new_from_db(student) }
+    DB[:conn].execute(sql).map do |row|
+      self.new_from_db(row)
+    end
   end
 
 
   def self.first_X_students_in_grade_10(x)
-
-    DB[:conn].execute("SELECT * FROM students LIMIT ?", x)
-
+    sql = <<-SQL
+      SELECT *
+      FROM students
+      WHERE grade = 10
+      LIMIT ?
+    SQL
+   
+     DB[:conn].execute(sql, x).map do |row|
+      self.new_from_db(row)
+     end
   end
 
 
   def self.first_student_in_grade_10
-  student = DB[:conn].execute("SELECT * FROM students WHERE grade = 10 LIMIT 1;").flatten
-  new_from_db(student)
+    self.first_X_students_in_grade_10(1).first
   end
   
 
   def self.all_students_in_grade_X(grade)
-    students_arr = DB[:conn].execute("SELECT * FROM students WHERE grade = ?", grade)
-    students_arr.map {|student| new_from_db(student)}
-  end
+    sql = <<-SQL
+      SELECT *
+      FROM students
+      WHERE grade = ?
+     SQL
 
+    DB[:conn].execute(sql, grade).map do |row|
+      self.new_from_db(row)
+    end
+  end
 end
